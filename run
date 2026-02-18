@@ -258,7 +258,7 @@ if char and char:FindFirstChildWhichIsA("Humanoid") then
 	SpeedLabel.Text = "HIZ: " .. lastSpeed
 end
 
--- 31 AKTİF bildirimi (5 saniye)
+-- (5 saniye)
 local idLabel = Instance.new("TextLabel")
 idLabel.Size = UDim2.new(0, 200, 0, 60)
 idLabel.Position = UDim2.new(0.5, -100, 1, -80)
