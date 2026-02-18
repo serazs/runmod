@@ -78,8 +78,8 @@ cornerSpeed.Parent = SpeedLabel
 -- Geniş frame (ayar paneli)
 local FullFrame = Instance.new("Frame")
 FullFrame.Name = "FullSpeedFrame"
-FullFrame.Size = UDim2.new(0, 320, 0, 250)
-FullFrame.Position = UDim2.new(0.05, 0, 0.35, 0)
+FullFrame.Size = UDim2.new(0, 320, 0, 300)  -- biraz yüksekliği artırdık
+FullFrame.Position = UDim2.new(0.05, 0, 0.3, 0)
 FullFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 FullFrame.BackgroundTransparency = 0.1
 FullFrame.Visible = false
@@ -97,7 +97,7 @@ cornerFull.Parent = FullFrame
 -- Başlık
 local SetSpeedLabel = Instance.new("TextLabel")
 SetSpeedLabel.Name = "SetSpeedLabel"
-SetSpeedLabel.Size = UDim2.new(1, 0, 0.2, 0)
+SetSpeedLabel.Size = UDim2.new(1, 0, 0.15, 0)
 SetSpeedLabel.BackgroundTransparency = 1
 SetSpeedLabel.Text = "HIZ AYARI"
 SetSpeedLabel.TextColor3 = Color3.new(1, 1, 1)
@@ -108,8 +108,8 @@ SetSpeedLabel.Parent = FullFrame
 -- Giriş kutusu
 local SpeedInput = Instance.new("TextBox")
 SpeedInput.Name = "SpeedInput"
-SpeedInput.Size = UDim2.new(0.7, 0, 0.2, 0)
-SpeedInput.Position = UDim2.new(0.15, 0, 0.25, 0)
+SpeedInput.Size = UDim2.new(0.7, 0, 0.15, 0)
+SpeedInput.Position = UDim2.new(0.15, 0, 0.2, 0)
 SpeedInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 SpeedInput.TextColor3 = Color3.new(1, 1, 1)
 SpeedInput.PlaceholderText = "Hız (örn: 50)"
@@ -125,8 +125,8 @@ cornerInput.Parent = SpeedInput
 -- Ayarla butonu
 local SetSpeedButton = Instance.new("TextButton")
 SetSpeedButton.Name = "SetSpeedButton"
-SetSpeedButton.Size = UDim2.new(0.5, 0, 0.15, 0)
-SetSpeedButton.Position = UDim2.new(0.25, 0, 0.5, 0)
+SetSpeedButton.Size = UDim2.new(0.4, 0, 0.15, 0)
+SetSpeedButton.Position = UDim2.new(0.1, 0, 0.4, 0)
 SetSpeedButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)  -- kırmızı
 SetSpeedButton.Text = "AYARLA"
 SetSpeedButton.TextColor3 = Color3.new(1, 1, 1)
@@ -137,6 +137,22 @@ SetSpeedButton.Parent = FullFrame
 local cornerSet = Instance.new("UICorner")
 cornerSet.CornerRadius = UDim.new(0, 12)
 cornerSet.Parent = SetSpeedButton
+
+-- Sıfırla butonu (orijinal hıza dön)
+local ResetSpeedButton = Instance.new("TextButton")
+ResetSpeedButton.Name = "ResetSpeedButton"
+ResetSpeedButton.Size = UDim2.new(0.4, 0, 0.15, 0)
+ResetSpeedButton.Position = UDim2.new(0.5, 10, 0.4, 0)  -- yan yana
+ResetSpeedButton.BackgroundColor3 = Color3.fromRGB(100, 100, 255)  -- mavi
+ResetSpeedButton.Text = "SIFIRLA"
+ResetSpeedButton.TextColor3 = Color3.new(1, 1, 1)
+ResetSpeedButton.Font = Enum.Font.GothamBold
+ResetSpeedButton.TextSize = 18
+ResetSpeedButton.Parent = FullFrame
+
+local cornerReset = Instance.new("UICorner")
+cornerReset.CornerRadius = UDim.new(0, 12)
+cornerReset.Parent = ResetSpeedButton
 
 -- Küçült butonu (eksi)
 local MinusButton = Instance.new("TextButton")
@@ -160,7 +176,7 @@ CreditLabel.Name = "CreditLabel"
 CreditLabel.Size = UDim2.new(1, -20, 0, 30)
 CreditLabel.Position = UDim2.new(0, 10, 1, -40)
 CreditLabel.BackgroundTransparency = 1
-CreditLabel.Text = "xeno run mod "
+CreditLabel.Text = "xeno run mod"
 CreditLabel.TextColor3 = Color3.fromRGB(200,200,200)
 CreditLabel.Font = Enum.Font.Gotham
 CreditLabel.TextSize = 16
@@ -201,6 +217,9 @@ MinusButton.MouseButton1Click:Connect(function()
 	FullFrame.Visible = false
 end)
 
+-- Orijinal hızı saklamak için değişken
+local originalSpeed = 16  -- varsayılan
+
 -- Hız ayarlama butonu
 SetSpeedButton.MouseButton1Click:Connect(function()
 	local newSpeed = tonumber(SpeedInput.Text)
@@ -209,6 +228,7 @@ SetSpeedButton.MouseButton1Click:Connect(function()
 		if char and char:FindFirstChildWhichIsA("Humanoid") then
 			char.Humanoid.WalkSpeed = newSpeed
 			SpeedLabel.Text = "HIZ: " .. newSpeed
+			lastSpeed = newSpeed  -- lastSpeed'i de güncelle
 		else
 			-- Karakter yoksa bekle
 			player.CharacterAdded:Connect(function(c)
@@ -216,12 +236,33 @@ SetSpeedButton.MouseButton1Click:Connect(function()
 				if c and c:FindFirstChildWhichIsA("Humanoid") then
 					c.Humanoid.WalkSpeed = newSpeed
 					SpeedLabel.Text = "HIZ: " .. newSpeed
+					lastSpeed = newSpeed
 				end
 			end)
 		end
 	else
 		SpeedInput.Text = ""
 		SpeedInput.PlaceholderText = "Geçersiz sayı!"
+	end
+end)
+
+-- Sıfırla butonu (orijinal hıza dön)
+ResetSpeedButton.MouseButton1Click:Connect(function()
+	local char = player.Character
+	if char and char:FindFirstChildWhichIsA("Humanoid") then
+		char.Humanoid.WalkSpeed = originalSpeed
+		SpeedLabel.Text = "HIZ: " .. originalSpeed
+		lastSpeed = originalSpeed  -- lastSpeed'i orijinale çek
+	else
+		-- Karakter yoksa bekle
+		player.CharacterAdded:Connect(function(c)
+			task.wait(0.5)
+			if c and c:FindFirstChildWhichIsA("Humanoid") then
+				c.Humanoid.WalkSpeed = originalSpeed
+				SpeedLabel.Text = "HIZ: " .. originalSpeed
+				lastSpeed = originalSpeed
+			end
+		end)
 	end
 end)
 
@@ -241,24 +282,29 @@ SetSpeedButton.MouseButton1Click:Connect(function()
 	local s = tonumber(SpeedInput.Text)
 	if s then lastSpeed = s end
 end)
+ResetSpeedButton.MouseButton1Click:Connect(function()
+	lastSpeed = originalSpeed
+end)
 
 player.CharacterAdded:Connect(function(char)
 	task.wait(0.5)
 	local hum = char:FindFirstChildWhichIsA("Humanoid")
 	if hum and lastSpeed then
 		hum.WalkSpeed = lastSpeed
+		SpeedLabel.Text = "HIZ: " .. lastSpeed
 	end
 end)
 
--- Başlangıçta karakter varsa hızı oku
+-- Başlangıçta karakter varsa hızı oku ve orijinal hızı kaydet
 task.wait(0.5)
 local char = player.Character
 if char and char:FindFirstChildWhichIsA("Humanoid") then
-	lastSpeed = char.Humanoid.WalkSpeed
+	originalSpeed = char.Humanoid.WalkSpeed
+	lastSpeed = originalSpeed
 	SpeedLabel.Text = "HIZ: " .. lastSpeed
 end
 
--- (5 saniye)
+-- 31 AKTİF bildirimi (5 saniye)
 local idLabel = Instance.new("TextLabel")
 idLabel.Size = UDim2.new(0, 200, 0, 60)
 idLabel.Position = UDim2.new(0.5, -100, 1, -80)
