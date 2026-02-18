@@ -1,9 +1,10 @@
--- LocalScript (çalıştırmak için bir executer kullan)
+-- LocalScript (Xeno vb. executer'da çalıştır)
 
 local player = game.Players.LocalPlayer
-local coreGui = game:GetService("CoreGui") -- CoreGui'ye koyarsak resetlemez
+local coreGui = game:GetService("CoreGui")
+local runService = game:GetService("RunService")
 
--- Eğer zaten varsa eskiyi kaldır (çift GUI önle)
+-- Eğer varsa eski GUI'yi kaldır
 local existing = coreGui:FindFirstChild("SpeedGUI")
 if existing then existing:Destroy() end
 
@@ -18,99 +19,115 @@ SpeedGUI.Parent = coreGui
 -- Küçük frame (artı butonu)
 local SmallerFrame = Instance.new("Frame")
 SmallerFrame.Name = "SmallerSpeedFrame"
-SmallerFrame.Size = UDim2.new(0, 60, 0, 60)  -- biraz büyüttüm
-SmallerFrame.Position = UDim2.new(0.05, 0, 0.85, 0)  -- biraz yukarı
-SmallerFrame.BackgroundColor3 = Color3.fromRGB(80, 80, 255)  -- mavi
-SmallerFrame.BackgroundTransparency = 0.2
+SmallerFrame.Size = UDim2.new(0, 70, 0, 70)
+SmallerFrame.Position = UDim2.new(0.05, 0, 0.85, 0)
+SmallerFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)  -- koyu arkaplan
+SmallerFrame.BackgroundTransparency = 0.1
 SmallerFrame.Parent = SpeedGUI
+
+-- Kenarlık (stroke) - RGB efekti için
+local strokeSmall = Instance.new("UIStroke")
+strokeSmall.Thickness = 3
+strokeSmall.Color = Color3.fromRGB(255, 0, 0)  -- geçici, RGB döngüde değişecek
+strokeSmall.Parent = SmallerFrame
 
 -- Köşeleri yuvarlat
 local cornerSmall = Instance.new("UICorner")
-cornerSmall.CornerRadius = UDim.new(0, 15)
+cornerSmall.CornerRadius = UDim.new(0, 20)
 cornerSmall.Parent = SmallerFrame
 
 -- Artı butonu
 local PlusButton = Instance.new("TextButton")
 PlusButton.Name = "PlusButton"
 PlusButton.Size = UDim2.new(1, 0, 1, 0)
-PlusButton.BackgroundColor3 = Color3.fromRGB(80, 80, 255)
+PlusButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 PlusButton.BackgroundTransparency = 0.2
 PlusButton.Text = "+"
 PlusButton.TextColor3 = Color3.new(1, 1, 1)
 PlusButton.Font = Enum.Font.GothamBold
-PlusButton.TextSize = 30
+PlusButton.TextSize = 36
 PlusButton.Parent = SmallerFrame
 
--- Artı butonun köşeleri
 local cornerPlus = Instance.new("UICorner")
-cornerPlus.CornerRadius = UDim.new(0, 15)
+cornerPlus.CornerRadius = UDim.new(0, 20)
 cornerPlus.Parent = PlusButton
 
 -- Hız göstergesi (küçük frame'in yanında)
 local SpeedLabel = Instance.new("TextLabel")
 SpeedLabel.Name = "SpeedLabel"
-SpeedLabel.Size = UDim2.new(0, 120, 0, 40)
+SpeedLabel.Size = UDim2.new(0, 140, 0, 50)
 SpeedLabel.Position = UDim2.new(1, 10, 0, 10)
-SpeedLabel.BackgroundColor3 = Color3.fromRGB(80, 80, 255)
-SpeedLabel.BackgroundTransparency = 0.2
-SpeedLabel.Text = "Hız: 16"  -- varsayılan walkspeed
+SpeedLabel.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+SpeedLabel.BackgroundTransparency = 0.1
+SpeedLabel.Text = "HIZ: 16"
 SpeedLabel.TextColor3 = Color3.new(1, 1, 1)
 SpeedLabel.Font = Enum.Font.GothamBold
-SpeedLabel.TextSize = 18
+SpeedLabel.TextSize = 20
 SpeedLabel.Parent = SmallerFrame
 
+-- Hız göstergesine de stroke
+local strokeSpeed = Instance.new("UIStroke")
+strokeSpeed.Thickness = 2
+strokeSpeed.Color = Color3.fromRGB(255, 0, 0)
+strokeSpeed.Parent = SpeedLabel
+
 local cornerSpeed = Instance.new("UICorner")
-cornerSpeed.CornerRadius = UDim.new(0, 10)
+cornerSpeed.CornerRadius = UDim.new(0, 15)
 cornerSpeed.Parent = SpeedLabel
 
 -- Geniş frame (ayar paneli)
 local FullFrame = Instance.new("Frame")
 FullFrame.Name = "FullSpeedFrame"
-FullFrame.Size = UDim2.new(0, 300, 0, 200)
-FullFrame.Position = UDim2.new(0.05, 0, 0.4, 0)
-FullFrame.BackgroundColor3 = Color3.fromRGB(80, 80, 255)
+FullFrame.Size = UDim2.new(0, 320, 0, 250)
+FullFrame.Position = UDim2.new(0.05, 0, 0.35, 0)
+FullFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 FullFrame.BackgroundTransparency = 0.1
 FullFrame.Visible = false
 FullFrame.Parent = SpeedGUI
 
+local strokeFull = Instance.new("UIStroke")
+strokeFull.Thickness = 4
+strokeFull.Color = Color3.fromRGB(255, 0, 0)
+strokeFull.Parent = FullFrame
+
 local cornerFull = Instance.new("UICorner")
-cornerFull.CornerRadius = UDim.new(0, 20)
+cornerFull.CornerRadius = UDim.new(0, 25)
 cornerFull.Parent = FullFrame
 
 -- Başlık
 local SetSpeedLabel = Instance.new("TextLabel")
 SetSpeedLabel.Name = "SetSpeedLabel"
-SetSpeedLabel.Size = UDim2.new(1, 0, 0.25, 0)
+SetSpeedLabel.Size = UDim2.new(1, 0, 0.2, 0)
 SetSpeedLabel.BackgroundTransparency = 1
-SetSpeedLabel.Text = "Hız Ayarı"
+SetSpeedLabel.Text = "HIZ AYARI"
 SetSpeedLabel.TextColor3 = Color3.new(1, 1, 1)
 SetSpeedLabel.Font = Enum.Font.GothamBold
-SetSpeedLabel.TextSize = 22
+SetSpeedLabel.TextSize = 24
 SetSpeedLabel.Parent = FullFrame
 
 -- Giriş kutusu
 local SpeedInput = Instance.new("TextBox")
 SpeedInput.Name = "SpeedInput"
-SpeedInput.Size = UDim2.new(0.7, 0, 0.25, 0)
-SpeedInput.Position = UDim2.new(0.15, 0, 0.3, 0)
-SpeedInput.BackgroundColor3 = Color3.new(1, 1, 1)
-SpeedInput.TextColor3 = Color3.new(0, 0, 0)
+SpeedInput.Size = UDim2.new(0.7, 0, 0.2, 0)
+SpeedInput.Position = UDim2.new(0.15, 0, 0.25, 0)
+SpeedInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+SpeedInput.TextColor3 = Color3.new(1, 1, 1)
 SpeedInput.PlaceholderText = "Hız (örn: 50)"
 SpeedInput.PlaceholderColor3 = Color3.fromRGB(150,150,150)
 SpeedInput.Font = Enum.Font.Gotham
-SpeedInput.TextSize = 16
+SpeedInput.TextSize = 18
 SpeedInput.Parent = FullFrame
 
 local cornerInput = Instance.new("UICorner")
-cornerInput.CornerRadius = UDim.new(0, 8)
+cornerInput.CornerRadius = UDim.new(0, 10)
 cornerInput.Parent = SpeedInput
 
 -- Ayarla butonu
 local SetSpeedButton = Instance.new("TextButton")
 SetSpeedButton.Name = "SetSpeedButton"
-SetSpeedButton.Size = UDim2.new(0.7, 0, 0.25, 0)
-SetSpeedButton.Position = UDim2.new(0.15, 0, 0.6, 0)
-SetSpeedButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+SetSpeedButton.Size = UDim2.new(0.5, 0, 0.15, 0)
+SetSpeedButton.Position = UDim2.new(0.25, 0, 0.5, 0)
+SetSpeedButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)  -- kırmızı
 SetSpeedButton.Text = "AYARLA"
 SetSpeedButton.TextColor3 = Color3.new(1, 1, 1)
 SetSpeedButton.Font = Enum.Font.GothamBold
@@ -118,124 +135,146 @@ SetSpeedButton.TextSize = 18
 SetSpeedButton.Parent = FullFrame
 
 local cornerSet = Instance.new("UICorner")
-cornerSet.CornerRadius = UDim.new(0, 10)
+cornerSet.CornerRadius = UDim.new(0, 12)
 cornerSet.Parent = SetSpeedButton
 
 -- Küçült butonu (eksi)
 local MinusButton = Instance.new("TextButton")
 MinusButton.Name = "MinusButton"
-MinusButton.Size = UDim2.new(0, 30, 0, 30)
-MinusButton.Position = UDim2.new(1, -40, 0, 10)
-MinusButton.BackgroundColor3 = Color3.fromRGB(255, 70, 70)
+MinusButton.Size = UDim2.new(0, 35, 0, 35)
+MinusButton.Position = UDim2.new(1, -45, 0, 10)
+MinusButton.BackgroundColor3 = Color3.fromRGB(255, 100, 100)
 MinusButton.Text = "-"
 MinusButton.TextColor3 = Color3.new(1, 1, 1)
 MinusButton.Font = Enum.Font.GothamBold
-MinusButton.TextSize = 24
+MinusButton.TextSize = 28
 MinusButton.Parent = FullFrame
 
 local cornerMinus = Instance.new("UICorner")
-cornerMinus.CornerRadius = UDim.new(0, 8)
+cornerMinus.CornerRadius = UDim.new(0, 10)
 cornerMinus.Parent = MinusButton
 
--- Kredi yazısı (alt köşede)
+-- Kredi yazısı (alt)
 local CreditLabel = Instance.new("TextLabel")
 CreditLabel.Name = "CreditLabel"
-CreditLabel.Size = UDim2.new(1, -10, 0, 25)
-CreditLabel.Position = UDim2.new(0, 5, 1, -30)
+CreditLabel.Size = UDim2.new(1, -20, 0, 30)
+CreditLabel.Position = UDim2.new(0, 10, 1, -40)
 CreditLabel.BackgroundTransparency = 1
 CreditLabel.Text = "Made by Valfelx | 31 AKTİF"
 CreditLabel.TextColor3 = Color3.fromRGB(200,200,200)
 CreditLabel.Font = Enum.Font.Gotham
-CreditLabel.TextSize = 14
+CreditLabel.TextSize = 16
 CreditLabel.TextXAlignment = Enum.TextXAlignment.Right
 CreditLabel.Parent = FullFrame
 
+-- RGB efekt döngüsü (tüm strok'lara uygulanır)
+task.spawn(function()
+	local hue = 0
+	while true do
+		hue = hue + 0.005
+		if hue > 1 then hue = 0 end
+		local color = Color3.fromHSV(hue, 1, 1)
+		
+		if strokeSmall and strokeSmall.Parent then
+			strokeSmall.Color = color
+		end
+		if strokeSpeed and strokeSpeed.Parent then
+			strokeSpeed.Color = color
+		end
+		if strokeFull and strokeFull.Parent then
+			strokeFull.Color = color
+		end
+		
+		task.wait(0.03)
+	end
+end)
+
 -- Fonksiyon: geniş paneli aç, küçük frame'i gizle
 local function expandFullGUI()
-    SmallerFrame.Visible = false
-    FullFrame.Visible = true
+	SmallerFrame.Visible = false
+	FullFrame.Visible = true
 end
 
 -- Eksi butonuna basınca küçült
 MinusButton.MouseButton1Click:Connect(function()
-    SmallerFrame.Visible = true
-    FullFrame.Visible = false
+	SmallerFrame.Visible = true
+	FullFrame.Visible = false
 end)
 
 -- Hız ayarlama butonu
 SetSpeedButton.MouseButton1Click:Connect(function()
-    local newSpeed = tonumber(SpeedInput.Text)
-    if newSpeed and newSpeed > 0 then
-        local char = player.Character
-        if char and char:FindFirstChildWhichIsA("Humanoid") then
-            char.Humanoid.WalkSpeed = newSpeed
-            SpeedLabel.Text = "Hız: " .. newSpeed
-        else
-            -- Karakter yoksa bekle
-            player.CharacterAdded:Connect(function(c)
-                task.wait(0.5)
-                if c and c:FindFirstChildWhichIsA("Humanoid") then
-                    c.Humanoid.WalkSpeed = newSpeed
-                    SpeedLabel.Text = "Hız: " .. newSpeed
-                end
-            end)
-        end
-    else
-        SpeedInput.Text = ""
-        SpeedInput.PlaceholderText = "Geçersiz sayı!"
-    end
+	local newSpeed = tonumber(SpeedInput.Text)
+	if newSpeed and newSpeed > 0 then
+		local char = player.Character
+		if char and char:FindFirstChildWhichIsA("Humanoid") then
+			char.Humanoid.WalkSpeed = newSpeed
+			SpeedLabel.Text = "HIZ: " .. newSpeed
+		else
+			-- Karakter yoksa bekle
+			player.CharacterAdded:Connect(function(c)
+				task.wait(0.5)
+				if c and c:FindFirstChildWhichIsA("Humanoid") then
+					c.Humanoid.WalkSpeed = newSpeed
+					SpeedLabel.Text = "HIZ: " .. newSpeed
+				end
+			end)
+		end
+	else
+		SpeedInput.Text = ""
+		SpeedInput.PlaceholderText = "Geçersiz sayı!"
+	end
 end)
 
 -- Artı butonu aç/kapat
 PlusButton.MouseButton1Click:Connect(function()
-    if FullFrame.Visible then
-        SmallerFrame.Visible = true
-        FullFrame.Visible = false
-    else
-        expandFullGUI()
-    end
+	if FullFrame.Visible then
+		SmallerFrame.Visible = true
+		FullFrame.Visible = false
+	else
+		expandFullGUI()
+	end
 end)
 
 -- Karakter değişince hızı koru (ayarlanan son hızı hatırla)
 local lastSpeed = 16  -- varsayılan
 SetSpeedButton.MouseButton1Click:Connect(function()
-    local s = tonumber(SpeedInput.Text)
-    if s then lastSpeed = s end
+	local s = tonumber(SpeedInput.Text)
+	if s then lastSpeed = s end
 end)
 
 player.CharacterAdded:Connect(function(char)
-    task.wait(0.5)
-    local hum = char:FindFirstChildWhichIsA("Humanoid")
-    if hum and lastSpeed then
-        hum.WalkSpeed = lastSpeed
-    end
+	task.wait(0.5)
+	local hum = char:FindFirstChildWhichIsA("Humanoid")
+	if hum and lastSpeed then
+		hum.WalkSpeed = lastSpeed
+	end
 end)
 
 -- Başlangıçta karakter varsa hızı oku
 task.wait(0.5)
 local char = player.Character
 if char and char:FindFirstChildWhichIsA("Humanoid") then
-    lastSpeed = char.Humanoid.WalkSpeed
-    SpeedLabel.Text = "Hız: " .. lastSpeed
+	lastSpeed = char.Humanoid.WalkSpeed
+	SpeedLabel.Text = "HIZ: " .. lastSpeed
 end
 
--- Küçük bir "31 AKTİF" bildirimi (isteğe bağlı)
+-- 31 AKTİF bildirimi (5 saniye)
 local idLabel = Instance.new("TextLabel")
-idLabel.Size = UDim2.new(0, 150, 0, 50)
-idLabel.Position = UDim2.new(0.5, -75, 1, -60)
+idLabel.Size = UDim2.new(0, 200, 0, 60)
+idLabel.Position = UDim2.new(0.5, -100, 1, -80)
 idLabel.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
 idLabel.BackgroundTransparency = 0.2
 idLabel.Text = "31 AKTİF"
 idLabel.TextColor3 = Color3.new(1, 1, 1)
 idLabel.Font = Enum.Font.GothamBold
-idLabel.TextSize = 28
+idLabel.TextSize = 36
 idLabel.TextStrokeTransparency = 0.3
 idLabel.Parent = coreGui
 
 local idCorner = Instance.new("UICorner")
-idCorner.CornerRadius = UDim.new(0, 15)
+idCorner.CornerRadius = UDim.new(0, 20)
 idCorner.Parent = idLabel
 
 task.delay(5, function()
-    idLabel:Destroy()
+	idLabel:Destroy()
 end)
